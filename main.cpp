@@ -53,6 +53,14 @@ int main(int argc, char *argv[]) {
     stack_size *= 8;
 
 
+#ifdef _WIN32
+    int total_stack = stack_size + 32;
+    if (total_stack % 16 != 0) {
+        total_stack += 16 - (total_stack % 16);
+    }
+#endif
+
+
     std::ofstream asm_file("prog.asm");
 
 #ifdef _WIN32
@@ -61,7 +69,14 @@ int main(int argc, char *argv[]) {
 
     asm_file << "global _start\nsection .text\n_start:\n";
     asm_file << "   push rbp\n   mov rbp, rsp\n";
+
+#ifdef _WIN32
+    asm_file << "   sub rsp, " << total_stack << std::endl;
+#else
     asm_file << "   sub rsp, " << stack_size << std::endl;
+#endif
+
+
 
 
     std::unordered_map<std::string, int> var_table;
