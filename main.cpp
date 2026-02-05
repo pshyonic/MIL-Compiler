@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    ret = system("GoLink /console /entry _start prog.o user32.dll kernel32.dll");
+    ret = system("GoLink /console /entry _start prog.obj user32.dll kernel32.dll");
     if (ret != 0) {
         std::cerr << "Linking Failed" << std::endl;
         exit(1);
