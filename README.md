@@ -1,8 +1,8 @@
 # 🔧 MIL Compiler
 
-> A high-performance compiler for the MIL (Minimal Intermediate Language) programming language, written in modern C++17.
+> A high-performance compiler for the MIL (Minimal Intermediate Language) programming language, written in C++20.
 
-[![C++](https://img.shields.io/badge/C%2B%2B-17-blue?logo=cplusplus)](https://isocpp.org/)
+[![C++](https://img.shields.io/badge/C%2B%2B-20-blue?logo=cplusplus)](https://isocpp.org/)
 [![CMake](https://img.shields.io/badge/CMake-3.10%2B-064687?logo=cmake)](https://cmake.org/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
@@ -11,9 +11,10 @@
 | Tool | Version | Purpose |
 |------|---------|---------|
 | **CMake** | 3.10+ | Build configuration |
-| **C++ Compiler** | C++17 | Compilation (GCC 7.0+, Clang 5.0+, or MSVC 2017+) |
-| **Make** | Any | Build execution |
+| **C++ Compiler** | C++20 | Compilation (GCC 7.0+, Clang 5.0+, or MSVC 2017+) |
+| **Make** | Any | Build execution (Linux) |
 | **NASM** | Any | Assembly to machine code |
+| **GoLink** | Any | Linker (Windows, for generated objects) |
 
 ### ⚙️ Installation
 
@@ -26,25 +27,27 @@ sudo apt-get install cmake build-essential nasm
 </details>
 
 <details>
-<summary><b>macOS</b></summary>
-
-```bash
-brew install cmake nasm
-# Xcode Command Line Tools should be installed automatically
-```
-</details>
-
-<details>
 <summary><b>Windows</b></summary>
 
 1. Download and install [CMake](https://cmake.org/download/)
 2. Download and install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/)
 3. Download and install [NASM](https://www.nasm.us/)
+4. Download **GoLink** (linker) and add it to your `PATH`
+
+   - Download: https://www.godevtool.com/GolinkHelp/ (make sure you can locate `golink.exe`)
+   - Add the folder containing `golink.exe` to your user or system `PATH`
+   - Verify in **PowerShell**:
+
+     ```powershell
+     golink /?
+     ```
 </details>
 
 ## 🚀 Quick Start
 
 ### Build Instructions
+
+#### Linux (Ubuntu/Debian)
 
 ```bash
 # Clone the repository
@@ -60,7 +63,21 @@ cmake ..
 make
 ```
 
-The compiled executable `compiler` will be generated in the `build/` directory.
+#### Windows (PowerShell)
+
+Run from a **Developer PowerShell for VS** (or any shell where MSVC is available):
+
+```powershell
+# Clone the repository
+git clone <repository-url>
+cd MIL
+
+# Configure + build (multi-config generators like Visual Studio)
+cmake -S . -B build
+cmake --build build --config Release
+```
+
+The compiled executable will be generated in `build/` (on Windows with Visual Studio generators it is typically under `build/Release/`).
 
 ## 💻 Usage
 
@@ -70,12 +87,39 @@ Run the compiler with a MIL source file:
 ./compiler <path-to-file.mil>
 ```
 
+On Windows (PowerShell):
+
+```powershell
+.\compiler.exe <path-to-file.mil>
+```
+
 ### Example:
 ```bash
 ./compiler ../dummy.mil
 ```
 
 The compiler will parse your MIL code and generate assembly output.
+
+## ✅ How To Test (Current Project Stage)
+
+At the current stage, the simplest way to validate behavior is:
+
+1. Run the compiled program.
+2. Check the process **exit code** (0 usually means success; non-zero means an error occurred).
+
+### Linux
+
+```bash
+./compiler ../dummy.mil
+echo $?
+```
+
+### Windows (PowerShell)
+
+```powershell
+.\compiler.exe ..\dummy.mil
+$LASTEXITCODE
+```
 
 ## 📁 Project Structure
 
