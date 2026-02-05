@@ -1,0 +1,2 @@
+kill(): function that terminates the program with an error code
+let: used to delcare variables
