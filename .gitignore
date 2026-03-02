@@ -31,3 +31,5 @@ compiler
 prog
 prog.asm
 *.out
+
+/test

@@ -8,5 +8,7 @@ $$
     \text{EQUALS} = \text{'='} \\
     \text{IDENTIFIER} = \text{[\_alphabet][\_alphanum]*} \\
 
-    \text{FINAL\_RE} = \text{INT\_LITERAL | KEYWORD | LPAREN | RPAREN | SEMI }     
+    \text{FINAL\_RE} = \text{INT\_LITERAL | KEYWORD | LPAREN | RPAREN | SEMI }     \\
+
+    \text{PLUS\_OP} = \text{+}
 $$
