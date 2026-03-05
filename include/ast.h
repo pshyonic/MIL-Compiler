@@ -2,9 +2,11 @@
 #include <memory>
 #include <unordered_map>
 
+
 struct expr_node {
     virtual ~expr_node() = default;
 };
+
 
 struct int_literal_node : expr_node {
     int value;
@@ -17,6 +19,45 @@ struct ident_node : expr_node {
 
     explicit ident_node(std::string n) : name(std::move(n)) {}
 };
+
+struct binary_expr_node : expr_node {
+    TokenType _operator;
+    std::unique_ptr<expr_node> left, right;
+    explicit binary_expr_node(TokenType o, std::unique_ptr<expr_node> l, std::unique_ptr<expr_node> r) : _operator(o), left(std::move(l)), right(std::move(r)) {}
+};
+
+
+inline void codegen_expr_node(std::ostream &out, std::unique_ptr<expr_node>& expr, std::unordered_map<std::string, int>& var_table) {
+
+    if (auto int_node = dynamic_cast<int_literal_node*>(expr.get())) {
+        out << "    mov rax, " << int_node->value << std::endl;
+        return;
+    }
+
+    if (auto ident = dynamic_cast<ident_node* >(expr.get())) {
+        if (var_table.find(ident->name) == var_table.end()) {
+            std::cerr << "Variable " << ident->name << " not declared" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+        int ident_offset = -8 *(var_table.at(ident->name) + 1);
+        out << "    mov rax, [rbp " << ident_offset <<"]\n";
+        return;
+    }
+
+    if (auto bin = dynamic_cast<binary_expr_node*>(expr.get())) {
+        codegen_expr_node(out, bin->left, var_table);
+        out << "    PUSH rax\n";
+
+        codegen_expr_node(out, bin->right, var_table);
+        out << "    POP rbx\n";
+
+        out << "    add rax, rbx\n";
+    }
+
+
+}
+
 
 struct stmt_node {
     virtual ~stmt_node() = default;
@@ -81,29 +122,33 @@ struct decl_stmt_node : stmt_node {
                  int &var_count) override {
         int offset = -8 * (var_count + 1);
         if (var_table.find(name) != var_table.end()) {
-            std::cerr << "Variable " << name << " is being redeclared"
+            std::cerr << "Variable " << name << " is being redefined"
                       << std::endl;
             exit(1);
         }
         var_table[name] = var_count;
         var_count++;
 
-        auto int_node = dynamic_cast<int_literal_node *>(expr.get());
-        if (int_node) {
-            out << "    mov rax, " << int_node->value << std::endl;
-            out << "    mov [rbp " << offset << "], rax\n";
-        } else {
-            auto ident = dynamic_cast<ident_node *>(expr.get());
-            if (ident) {
-                if (var_table.find(ident->name) == var_table.end()) {
-                    std::cerr << "Variable " << ident->name << " not declared"
-                              << std::endl;
-                    exit(1);
-                }
-                int ident_offset = -8 * (var_table.at(ident->name) + 1);
-                out << "    mov rax, [rbp " << ident_offset << "]\n";
-                out << "    mov [rbp " << offset << "], rax\n";
-            }
-        }
+        codegen_expr_node(out, expr, var_table);
+        out << "    mov [rbp " << offset << "], rax\n";
+
+        // auto int_node = dynamic_cast<int_literal_node *>(expr.get());
+        // if (int_node) {
+        //     out << "    mov rax, " << int_node->value << std::endl;
+        //     out << "    mov [rbp " << offset << "], rax\n";
+        // } else {
+        //     auto ident = dynamic_cast<ident_node *>(expr.get());
+        //     if (ident) {
+        //         if (var_table.find(ident->name) == var_table.end()) {
+        //             std::cerr << "Variable " << ident->name << " not declared"
+        //                       << std::endl;
+        //             exit(1);
+        //         }
+        //         int ident_offset = -8 * (var_table.at(ident->name) + 1);
+        //         out << "    mov rax, [rbp " << ident_offset << "]\n";
+        //         out << "    mov [rbp " << offset << "], rax\n";
+        //     }
+        // }
     }
 };
+

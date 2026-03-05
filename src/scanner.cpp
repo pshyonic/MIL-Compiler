@@ -165,6 +165,7 @@ Scanner::Scanner() {
     m_dfa[0][map_char(')')] = 4;
     m_dfa[0][map_char(';')] = 4;
     m_dfa[0][map_char('=')] = 4;
+    m_dfa[0][map_char('+')] = 4;
 }
 
 std::vector<Token> Scanner::scan_src(const std::string &src) const {
@@ -237,6 +238,10 @@ std::vector<Token> Scanner::scan_src(const std::string &src) const {
                   .contents = current_token});
     }
 
+    token_list.push_back(
+        Token{.type=TokenType::_EOF, .contents = std::string()}
+    );
+
     return token_list;
 }
 
@@ -263,6 +268,8 @@ int Scanner::map_char(char c) const {
         return 65;
     case '=':
         return 66;
+    case '+':
+        return 67;
     default:
         return -1;
     }
@@ -294,6 +301,8 @@ TokenType Scanner::getType(const std::string &accept_state,
             return TokenType::_SEMICOLON;
         } else if (accept_state == "=") {
             return TokenType::_EQUALS;
+        } else if (accept_state == "+") {
+            return TokenType::_PLUS;
         }
     }
 

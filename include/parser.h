@@ -21,6 +21,9 @@ class Parser {
     std::unique_ptr<stmt_node> parse_STMT();
     stmt_list parse_STMT_LIST();
 
+    std::unique_ptr<expr_node>  parse_TERM();
+    std::unique_ptr<expr_node> parse_AEXPR_R(std::unique_ptr<expr_node> left);
+    std::unique_ptr<expr_node> parse_AEXPR();
     std::unique_ptr<expr_node> parse_EXPR();
 
     Token scan_token();

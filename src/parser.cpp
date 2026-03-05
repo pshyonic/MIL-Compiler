@@ -21,7 +21,46 @@ Token Parser::scan_token() {
     return m_tokens->at(m_index++);
 }
 
+// std::unique_ptr<expr_node> Parser::parse_EXPR() {
+//     Token t = scan_token();
+//
+//     if (t.type == TokenType::INT_LIT) {
+//         return std::make_unique<int_literal_node>(stoi(t.contents));
+//     }
+//
+//     if (t.type == TokenType::_IDENTIFIER) {
+//         return std::make_unique<ident_node>(t.contents);
+//     }
+//
+//     std::cerr << "PARSE ERROR:\nExpected Expression Node" << std::endl;
+//     exit(1);
+// }
+
+
+
+
 std::unique_ptr<expr_node> Parser::parse_EXPR() {
+    return parse_AEXPR();
+}
+
+std::unique_ptr<expr_node> Parser::parse_AEXPR() {
+    auto left = parse_TERM();
+
+    return parse_AEXPR_R(std::move(left));
+}
+
+std::unique_ptr<expr_node> Parser::parse_AEXPR_R(std::unique_ptr<expr_node> left) {
+    while (peek_type() == TokenType::_PLUS) {
+        Token op = scan_token();
+        auto right = parse_TERM();
+
+        left = std::make_unique<binary_expr_node>(op.type, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<expr_node> Parser::parse_TERM() {
     Token t = scan_token();
 
     if (t.type == TokenType::INT_LIT) {
@@ -32,10 +71,19 @@ std::unique_ptr<expr_node> Parser::parse_EXPR() {
         return std::make_unique<ident_node>(t.contents);
     }
 
-    std::cerr << "PARSE ERROR:\nExpected Expression Node" << std::endl;
+    if (t.type == TokenType::LPAREN) {
+        auto _expr = parse_EXPR();
+        if (peek_type() == TokenType::RPAREN) {
+            expect_token(TokenType::RPAREN);
+            return _expr;
+        }
+    }
+
+
+
+    std::cerr << "PARSE ERROR:\nExpected Term Node" << std::endl;
     exit(1);
 }
-
 
 std::unique_ptr<stmt_node> Parser::parse_STMT() {
     Token t = scan_token();
@@ -63,8 +111,19 @@ std::unique_ptr<stmt_node> Parser::parse_STMT() {
 
 stmt_list Parser::parse_STMT_LIST() {
     stmt_list list;
+
+    if (peek_type() != TokenType::_KILL && peek_type() != TokenType::_LET) {
+        std::cerr << "Error: Expected Statement" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     while (peek_type() == TokenType::_KILL || peek_type() == TokenType::_LET) {
         list.push_back(parse_STMT());
+    }
+
+    if (peek_type() != TokenType::_EOF) {
+        std::cerr << "Unexpected/Unidentified Token Detected" << std::endl;
+        exit(EXIT_FAILURE);
     }
 
     return list;

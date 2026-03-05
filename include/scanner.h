@@ -5,7 +5,7 @@
 #include <vector>
 
 #define DFA_MAX_STATES 9
-#define DFA_MAX_ALPHABET 67
+#define DFA_MAX_ALPHABET 68
 
 enum class TokenType {
     _KILL,
@@ -15,7 +15,9 @@ enum class TokenType {
     _SEMICOLON,
     _EQUALS,
     _IDENTIFIER,
-    _LET
+    _LET,
+    _PLUS,
+    _EOF
 };
 
 struct Token {
@@ -57,13 +59,17 @@ class Scanner {
 
     size_t index;
 
+    // maps a character to get the transition index on the DFA
     int map_char(const char c) const;
 
+    // returns true if the state is an accept state
     bool is_accept_state(const int state) const;
 
+    // identifies the token type based on extracted string
     TokenType getType(const std::string &accept_state,
                       const int last_accept_state) const;
 
+    // checks if extracted string is a particular token
     TokenType isKeyword(const std::string& identifier) const;
 
     bool fitsInt32(const std::string& number) const;
