@@ -46,13 +46,16 @@ inline void codegen_expr_node(std::ostream &out, std::unique_ptr<expr_node>& exp
     }
 
     if (auto bin = dynamic_cast<binary_expr_node*>(expr.get())) {
-        codegen_expr_node(out, bin->left, var_table);
+        codegen_expr_node(out, bin->right, var_table);
         out << "    PUSH rax\n";
 
-        codegen_expr_node(out, bin->right, var_table);
+        codegen_expr_node(out, bin->left, var_table);
         out << "    POP rbx\n";
-
-        out << "    add rax, rbx\n";
+        if (bin->_operator == TokenType::_PLUS) {
+            out << "    ADD rax, rbx\n";
+        } else if (bin->_operator == TokenType::_MINUS) {
+            out << "    SUB rax, rbx\n";
+        }
     }
 
 

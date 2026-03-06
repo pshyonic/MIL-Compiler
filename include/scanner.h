@@ -5,7 +5,7 @@
 #include <vector>
 
 #define DFA_MAX_STATES 9
-#define DFA_MAX_ALPHABET 68
+#define DFA_MAX_ALPHABET 69
 
 enum class TokenType {
     _KILL,
@@ -17,6 +17,7 @@ enum class TokenType {
     _IDENTIFIER,
     _LET,
     _PLUS,
+    _MINUS,
     _EOF
 };
 
@@ -43,6 +44,10 @@ inline std::ostream &operator<<(std::ostream &os, TokenType t) {
         return os << "Identifier";
     case TokenType::_LET:
         return os << "Let";
+    case TokenType::_PLUS:
+        return os << "+";
+    case TokenType::_MINUS:
+        return os << "-";
     }
     return os << "<unexpected token>";
 }

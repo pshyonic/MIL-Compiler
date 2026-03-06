@@ -50,7 +50,7 @@ std::unique_ptr<expr_node> Parser::parse_AEXPR() {
 }
 
 std::unique_ptr<expr_node> Parser::parse_AEXPR_R(std::unique_ptr<expr_node> left) {
-    while (peek_type() == TokenType::_PLUS) {
+    while (peek_type() == TokenType::_PLUS || peek_type() == TokenType::_MINUS) {
         Token op = scan_token();
         auto right = parse_TERM();
 
