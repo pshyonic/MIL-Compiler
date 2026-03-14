@@ -6,7 +6,9 @@ $$
 \text{\_STMT} \to \text{let IDENT = \_EXPR;} \\
 \text{\_STMT} \to \text{IDENT = \_EXPR} \\
 \text{\_EXPR} \to \text{\_AEXPR} \\ 
-\text{\_AEXPR} \to \text{\_TERM | \_TERM \_AEXPR\_R} \\
-\text{\_AEXPR\_R} \to \text{ + \_TERM \_AEXPR | - \_TERM \_AEXPR | } \epsilon  \\
-\text{\_TERM} \to \text{IDENT | INT\_LIT | (\_EXPR)} 
+\text{\_AEXPR} \to \text{\_TERM \_AEXPR\_R} \\
+\text{\_AEXPR\_R} \to \text{ + \_TERM \_AEXPR\_R | - \_TERM \_AEXPR\_R | } \epsilon  \\
+\text{\_TERM} \to \text{\_FACTOR \_TERM\_R} \\
+\text{\_TERM\_R} \to \text{*\_FACTOR \_TERM\_R | /\_FACTOR \_TERM\_R | } \epsilon \\
+\text{\_FACTOR} \to \text{IDENT | INT\_LIT | (\_EXPR)}
 $$

@@ -61,6 +61,22 @@ std::unique_ptr<expr_node> Parser::parse_AEXPR_R(std::unique_ptr<expr_node> left
 }
 
 std::unique_ptr<expr_node> Parser::parse_TERM() {
+    auto left = parse_FACTOR();
+    return parse_TERM_R(std::move(left));
+}
+
+std::unique_ptr<expr_node> Parser::parse_TERM_R(std::unique_ptr<expr_node> left) {
+    while (peek_type() == TokenType::_MULT || peek_type() == TokenType::_DIV) {
+        Token op = scan_token();
+        auto right = parse_FACTOR();
+
+        left = std::make_unique<binary_expr_node>(op.type, std::move(left), std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<expr_node> Parser::parse_FACTOR() {
     Token t = scan_token();
 
     if (t.type == TokenType::INT_LIT) {
@@ -78,8 +94,6 @@ std::unique_ptr<expr_node> Parser::parse_TERM() {
             return _expr;
         }
     }
-
-
 
     std::cerr << "PARSE ERROR:\nExpected Term Node" << std::endl;
     exit(1);

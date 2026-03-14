@@ -10,6 +10,6 @@ $$
 
     \text{FINAL\_RE} = \text{INT\_LITERAL | KEYWORD | LPAREN | RPAREN | SEMI }     \\
 
-    \text{PLUS\_OP} = \text{+}
+    \text{PLUS\_OP} = \text{+} \\
     \text{MINUS\_OP} = \text{-}
 $$

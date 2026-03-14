@@ -55,6 +55,11 @@ inline void codegen_expr_node(std::ostream &out, std::unique_ptr<expr_node>& exp
             out << "    ADD rax, rbx\n";
         } else if (bin->_operator == TokenType::_MINUS) {
             out << "    SUB rax, rbx\n";
+        } else if (bin->_operator == TokenType::_MULT) {
+            out << "    IMUL rax, rbx\n";
+        } else if (bin->_operator == TokenType::_DIV) {
+            out << "    CQO\n";
+            out << "    IDIV rbx\n";
         }
     }
 

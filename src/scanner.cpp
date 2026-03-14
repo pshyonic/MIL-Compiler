@@ -167,6 +167,8 @@ Scanner::Scanner() {
     m_dfa[0][map_char('=')] = 4;
     m_dfa[0][map_char('+')] = 4;
     m_dfa[0][map_char('-')] = 4;
+    m_dfa[0][map_char('*')] = 4;
+    m_dfa[0][map_char('/')] = 4;
 }
 
 std::vector<Token> Scanner::scan_src(const std::string &src) const {
@@ -273,6 +275,10 @@ int Scanner::map_char(char c) const {
         return 67;
     case '-':
         return 68;
+    case '*':
+        return 69;
+    case '/':
+        return 70;
     default:
         return -1;
     }
@@ -308,6 +314,10 @@ TokenType Scanner::getType(const std::string &accept_state,
             return TokenType::_PLUS;
         } else if (accept_state == "-") {
             return TokenType::_MINUS;
+        } else if (accept_state == "*") {
+            return TokenType::_MULT;
+        } else if (accept_state == "/") {
+            return TokenType::_DIV;
         }
     }
 

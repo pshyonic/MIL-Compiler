@@ -5,7 +5,7 @@
 #include <vector>
 
 #define DFA_MAX_STATES 9
-#define DFA_MAX_ALPHABET 69
+#define DFA_MAX_ALPHABET 71
 
 enum class TokenType {
     _KILL,
@@ -18,6 +18,8 @@ enum class TokenType {
     _LET,
     _PLUS,
     _MINUS,
+    _MULT,
+    _DIV,
     _EOF
 };
 
