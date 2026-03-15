@@ -82,39 +82,18 @@ struct killstmt_node : stmt_node {
     void codegen(std::ostream &out,
                  std::unordered_map<std::string, int> &var_table,
                  int &var_count) override {
-#ifdef _WIN32
-#else
-        out << "    mov rax, 60\n"; // SYSCALL for exit
-#endif
 
-        auto int_node = dynamic_cast<int_literal_node *>(expr.get());
-        if (int_node) {
+        codegen_expr_node(out, expr, var_table);
+
 #ifdef _WIN32
-            out << "    mov rcx, " << int_node->value << std::endl;
-#else
-            out << "    mov rdi, " << int_node->value << std::endl;
-#endif
-        } else {
-            auto ident = dynamic_cast<ident_node *>(expr.get());
-            if (ident) {
-                if (var_table.find(ident->name) == var_table.end()) {
-                    std::cerr << "Variable " << ident->name << " not declared"
-                              << std::endl;
-                    exit(1);
-                }
-                int offset = -8 * (var_table.at(ident->name) + 1);
-#ifdef _WIN32
-                out << "    mov rcx, [rbp " << offset << "]\n";
-#else
-                out << "    mov rdi, [rbp " << offset << "]\n";
-#endif
-            }
-        }
-#ifdef _WIN32
+        out << "    mov rcx, rax\n";
         out << "    call ExitProcess\n";
 #else
+        out << "    mov rdi, rax\n";
+        out << "    mov rax, 60\n";
         out << "    SYSCALL\n";
 #endif
+
     }
 };
 
@@ -140,23 +119,45 @@ struct decl_stmt_node : stmt_node {
         codegen_expr_node(out, expr, var_table);
         out << "    mov [rbp " << offset << "], rax\n";
 
-        // auto int_node = dynamic_cast<int_literal_node *>(expr.get());
-        // if (int_node) {
-        //     out << "    mov rax, " << int_node->value << std::endl;
-        //     out << "    mov [rbp " << offset << "], rax\n";
-        // } else {
-        //     auto ident = dynamic_cast<ident_node *>(expr.get());
-        //     if (ident) {
-        //         if (var_table.find(ident->name) == var_table.end()) {
-        //             std::cerr << "Variable " << ident->name << " not declared"
-        //                       << std::endl;
-        //             exit(1);
-        //         }
-        //         int ident_offset = -8 * (var_table.at(ident->name) + 1);
-        //         out << "    mov rax, [rbp " << ident_offset << "]\n";
-        //         out << "    mov [rbp " << offset << "], rax\n";
-        //     }
-        // }
+    }
+};
+
+
+struct assign_stmt_node : stmt_node {
+    std::string name;
+    std::unique_ptr<expr_node> expr;
+
+    explicit assign_stmt_node(std::string n, std::unique_ptr<expr_node> e)
+         : name(std::move(n)), expr(std::move(e)) {}
+
+    void codegen(std::ostream &out,
+                 std::unordered_map<std::string, int> &var_table,
+                 int &var_count) override {
+
+        if (var_table.find(name) == var_table.end()) {
+            std::cerr << "Variable " << name << " is not defined"
+                      << std::endl;
+            exit(1);
+        }
+
+        int slot = var_table[name];
+        int offset = -8 * (slot + 1);
+
+        codegen_expr_node(out, expr, var_table);
+        out << "    mov [rbp " << offset << "], rax\n";
+
+    }
+
+};
+
+struct print_stmt_node : stmt_node {
+    std::unique_ptr<expr_node> expr;
+
+    explicit print_stmt_node(std::unique_ptr<expr_node> e) : expr(std::move(e)) {}
+
+    void codegen(std::ostream &out, std::unordered_map<std::string, int> &var_table, int &var_count) override {
+        codegen_expr_node(out, expr, var_table);
+        out << "    CALL print_int\n";
     }
 };
 

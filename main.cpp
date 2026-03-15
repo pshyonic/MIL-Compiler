@@ -43,15 +43,14 @@ int main(int argc, char *argv[]) {
     stmt_list ast = parser.parse_PROG();
 
     int stack_size = 0;
-    for (auto& stmt: ast) {
-        auto decl_stmt = dynamic_cast<decl_stmt_node*>(stmt.get());
+    for (auto &stmt : ast) {
+        auto decl_stmt = dynamic_cast<decl_stmt_node *>(stmt.get());
         if (decl_stmt) {
             stack_size++;
         }
     }
 
     stack_size *= 8;
-
 
 #ifdef _WIN32
     int total_stack = stack_size + 32;
@@ -60,11 +59,12 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-
     std::ofstream asm_file("prog.asm");
 
 #ifdef _WIN32
     asm_file << "extern ExitProcess\n";
+#else
+    asm_file << "extern print_int\n";
 #endif
 
     asm_file << "global _start\nsection .text\n_start:\n";
@@ -76,18 +76,14 @@ int main(int argc, char *argv[]) {
     asm_file << "   sub rsp, " << stack_size << std::endl;
 #endif
 
-
-
-
     std::unordered_map<std::string, int> var_table;
     int var_count = 0;
 
-    for (auto& stmt : ast) {
+    for (auto &stmt : ast) {
         stmt->codegen(asm_file, var_table, var_count);
     }
     asm_file << "ret";
     asm_file.close();
-
 
 #ifdef _WIN32
     int ret = system("nasm -f win64 prog.asm");
@@ -96,7 +92,8 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    ret = system("GoLink /console /entry _start prog.obj user32.dll kernel32.dll");
+    ret = system(
+        "GoLink /console /entry _start prog.obj user32.dll kernel32.dll");
     if (ret != 0) {
         std::cerr << "Linking Failed" << std::endl;
         exit(1);
@@ -110,15 +107,13 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    ret = system("ld prog.o -o prog");
+    ret = system("ld prog.o CMakeFiles/runtime.dir/runtime/linux/print_int_linux.asm.o -o prog");
     if (ret != 0) {
         std::cerr << "Linking Failed" << std::endl;
         exit(1);
     }
 
 #endif
-
-
 
     return 0;
 }

@@ -12,163 +12,53 @@ Scanner::Scanner() {
         }
     }
 
+    // Identifiers
+
+    for (char c = 'a'; c < 'z'; c++) {
+        m_dfa[0][map_char(c)] = 1;
+    }
+
+    for (char c = 'A'; c < 'Z'; c++) {
+        m_dfa[0][map_char(c)] = 1;
+    }
+
+    m_dfa[0][map_char('_')] = 1;
+
+    for (int i = 0; i <= 9; i++) {
+        m_dfa[1][i] = 1;
+    }
+
+    for (char c = 'a'; c < 'z'; c++) {
+        m_dfa[1][map_char(c)] = 1;
+    }
+
+    for (char c = 'A'; c < 'Z'; c++) {
+        m_dfa[1][map_char(c)] = 1;
+    }
+
+    m_dfa[1][map_char('_')] = 1;
+
+
+
     // INT LITERALS
 
     for (int i = 0; i <= 9; i++) {
-        m_dfa[0][i] = 5;
+        m_dfa[0][i] = 2;
     }
 
-    for (int i = 0; i <= 9; i++) {
-        m_dfa[5][i] = 5;
-    }
-
-    // Identifiers
-
-    // first char of indentifeir
-
-    // lowercase alphabet
-    for (char c = 'a'; c <= 'z'; c++) {
-        if (c != 'k' && c != 'l') {
-            m_dfa[0][map_char(c)] = 2;
-        }
-    }
-    // uppercase alphabet
-    for (char c = 'A'; c <= 'Z'; c++) {
-        m_dfa[0][map_char(c)] = 2;
-    }
-
-    // _
-    m_dfa[0][map_char('_')] = 2;
-
-    // 2nd character onwards
-
-    // number
     for (int i = 0; i <= 9; i++) {
         m_dfa[2][i] = 2;
     }
 
-    // lowercase alphabet
-    for (char c = 'a'; c <= 'z'; c++) {
-        if (c != 'k') {
-            m_dfa[2][map_char(c)] = 2;
-        }
-    }
-    // uppercase alphabet
-    for (char c = 'A'; c <= 'Z'; c++) {
-        m_dfa[2][map_char(c)] = 2;
-    }
-
-    // _
-    m_dfa[2][map_char('_')] = 2;
-
-    // Identifier Keyword Handling
-
-    // for state 1 when 'i' is not input
-
-    for (int i = 0; i <= 9; i++) {
-        m_dfa[1][i] = 2;
-    }
-
-    for (char c = 'a'; c <= 'z'; c++) {
-        if (c != 'i') {
-            m_dfa[1][map_char(c)] = 2;
-        }
-    }
-
-    for (char c = 'A'; c <= 'Z'; c++) {
-        m_dfa[1][map_char(c)] = 2;
-    }
-
-    m_dfa[1][map_char('_')] = 2;
-
-    // for state 6 when 'l' is not input
-
-    for (int i = 0; i <= 9; i++) {
-        m_dfa[6][i] = 2;
-    }
-
-    for (char c = 'a'; c <= 'z'; c++) {
-        if (c != 'l') {
-            m_dfa[6][map_char(c)] = 2;
-        }
-    }
-
-    for (char c = 'A'; c <= 'Z'; c++) {
-        m_dfa[6][map_char(c)] = 2;
-    }
-
-    m_dfa[6][map_char('_')] = 2;
-
-    // for state 8
-
-    for (int i = 0; i <= 9; i++) {
-        m_dfa[8][i] = 2;
-    }
-
-    for (char c = 'a'; c <= 'z'; c++) {
-        m_dfa[8][map_char(c)] = 2;
-    }
-
-    for (char c = 'A'; c <= 'Z'; c++) {
-        m_dfa[8][map_char(c)] = 2;
-    }
-
-    m_dfa[8][map_char('_')] = 2;
-
-    // for state 3 when 'e' is not input
-    for (int i = 0; i <= 9; i++) {
-        m_dfa[3][i] = 2;
-    }
-
-    for (char c = 'a'; c <= 'z'; c++) {
-        if (c != 'e') {
-            m_dfa[3][map_char(c)] = 2;
-        }
-    }
-
-    for (char c = 'A'; c <= 'Z'; c++) {
-        m_dfa[3][map_char(c)] = 2;
-    }
-
-    m_dfa[3][map_char('_')] = 2;
-
-    // for state 7
-    for (int i = 0; i <= 9; i++) {
-        m_dfa[6][i] = 2;
-    }
-
-    for (char c = 'a'; c <= 'z'; c++) {
-        m_dfa[6][map_char(c)] = 2;
-    }
-
-    for (char c = 'A'; c <= 'Z'; c++) {
-        m_dfa[6][map_char(c)] = 2;
-    }
-
-    m_dfa[6][map_char('_')] = 2;
-
-    // KEYWORDS
-
-    // KILL
-    m_dfa[0][map_char('k')] = 1;
-    m_dfa[1][map_char('i')] = 6;
-    m_dfa[6][map_char('l')] = 8;
-    m_dfa[8][map_char('l')] = 2;
-
-    // let
-    m_dfa[0][map_char('l')] = 3;
-    m_dfa[3][map_char('e')] = 7;
-    m_dfa[7][map_char('t')] = 2;
-
     // SINGLE CHAR
-    m_dfa[0][map_char('(')] = 4;
-    m_dfa[0][map_char(')')] = 4;
-    m_dfa[0][map_char(';')] = 4;
-    m_dfa[0][map_char('=')] = 4;
-    m_dfa[0][map_char('+')] = 4;
-    m_dfa[0][map_char('-')] = 4;
-    m_dfa[0][map_char('*')] = 4;
-    m_dfa[0][map_char('/')] = 4;
+    m_dfa[0][map_char('(')] = 3;
+    m_dfa[0][map_char(')')] = 3;
+    m_dfa[0][map_char(';')] = 3;
+    m_dfa[0][map_char('=')] = 3;
+    m_dfa[0][map_char('+')] = 3;
+    m_dfa[0][map_char('-')] = 3;
+    m_dfa[0][map_char('*')] = 3;
+    m_dfa[0][map_char('/')] = 3;
 }
 
 std::vector<Token> Scanner::scan_src(const std::string &src) const {
@@ -285,7 +175,7 @@ int Scanner::map_char(char c) const {
 }
 
 bool Scanner::is_accept_state(const int state) const {
-    if (state > 0 && state <= 8) //  1-8 are accept states
+    if (state > 0 && state <= 3) //  1-3 are accept states
         return true;
     else
         return false;
@@ -293,15 +183,15 @@ bool Scanner::is_accept_state(const int state) const {
 
 TokenType Scanner::getType(const std::string &accept_state,
                            const int last_accept_state) const {
-    if (last_accept_state == 5) {
+    if (last_accept_state == 2) {
         return TokenType::INT_LIT;
     }
 
-    if (last_accept_state == 2) {
+    if (last_accept_state == 1) {
         return isKeyword(accept_state);
     }
 
-    if (last_accept_state == 4) {
+    if (last_accept_state == 3) {
         if (accept_state == "(") {
             return TokenType::LPAREN;
         } else if (accept_state == ")") {
@@ -330,6 +220,8 @@ TokenType Scanner::isKeyword(const std::string &identifier) const {
         return TokenType::_KILL;
     } else if (identifier == "let") {
         return  TokenType::_LET;
+    } else if (identifier == "print") {
+        return TokenType::_PRINT;
     }
 
     return TokenType::_IDENTIFIER;

@@ -21,23 +21,6 @@ Token Parser::scan_token() {
     return m_tokens->at(m_index++);
 }
 
-// std::unique_ptr<expr_node> Parser::parse_EXPR() {
-//     Token t = scan_token();
-//
-//     if (t.type == TokenType::INT_LIT) {
-//         return std::make_unique<int_literal_node>(stoi(t.contents));
-//     }
-//
-//     if (t.type == TokenType::_IDENTIFIER) {
-//         return std::make_unique<ident_node>(t.contents);
-//     }
-//
-//     std::cerr << "PARSE ERROR:\nExpected Expression Node" << std::endl;
-//     exit(1);
-// }
-
-
-
 
 std::unique_ptr<expr_node> Parser::parse_EXPR() {
     return parse_AEXPR();
@@ -116,7 +99,19 @@ std::unique_ptr<stmt_node> Parser::parse_STMT() {
         expect_token(TokenType::_SEMICOLON);
 
         return std::make_unique<decl_stmt_node>(std::move(name), std::move(value));
-    } else {
+    } else if (t.type == TokenType::_IDENTIFIER) {
+        expect_token(TokenType::_EQUALS);
+        std::unique_ptr<expr_node> value = parse_EXPR();
+        expect_token(TokenType::_SEMICOLON);
+        return std::make_unique<assign_stmt_node>(std::move(t.contents), std::move(value));
+    } else if (t.type == TokenType::_PRINT) {
+        expect_token(TokenType::LPAREN);
+        std::unique_ptr<expr_node> value = parse_EXPR();
+        expect_token(TokenType::RPAREN);
+        expect_token(TokenType::_SEMICOLON);
+        return std::make_unique<print_stmt_node>(std::move(value));
+    }
+    else {
         std::cerr << "PARSE ERROR:\nExpected Kill or Let Tokens" << std::endl;
         exit(1);
     }
@@ -126,12 +121,12 @@ std::unique_ptr<stmt_node> Parser::parse_STMT() {
 stmt_list Parser::parse_STMT_LIST() {
     stmt_list list;
 
-    if (peek_type() != TokenType::_KILL && peek_type() != TokenType::_LET) {
+    if (peek_type() != TokenType::_KILL && peek_type() != TokenType::_LET && peek_type() != TokenType::_PRINT) {
         std::cerr << "Error: Expected Statement" << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    while (peek_type() == TokenType::_KILL || peek_type() == TokenType::_LET) {
+    while (peek_type() == TokenType::_KILL || peek_type() == TokenType::_LET || peek_type() == TokenType::_IDENTIFIER || peek_type() == TokenType::_PRINT) {
         list.push_back(parse_STMT());
     }
 
